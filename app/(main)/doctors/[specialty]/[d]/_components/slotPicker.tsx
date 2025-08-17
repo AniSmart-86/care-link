@@ -9,12 +9,23 @@ import { ChevronRight, Clock } from 'lucide-react';
 import React, { useState } from 'react'
 
 type Slot = {
-    startTime: string;
-    endTime: string;
+    startTime: Date;
+    endTime: Date;
     formatted: string;
 };
 
-const SlotPicker = ({days, onSelectSlot}: {days: any[]; onSelectSlot: (slot: Slot) => void;}) => {
+type Day = {
+  date: string;
+  slots: Slot[];
+displayDate: string;
+};
+
+type SlotPickerProps = {
+  days: Day[];
+  onSelectSlot: (slot: Slot) => void;
+};
+
+const SlotPicker = ({days, onSelectSlot}: SlotPickerProps) => {
 
     const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
 
@@ -68,16 +79,16 @@ const SlotPicker = ({days, onSelectSlot}: {days: any[]; onSelectSlot: (slot: Slo
             <TabsContent key={day.date}
                         value={day.date}
                         className='pt-4'>
-                            {day.slot.length === 0 ? (
+                            {day.slots.length === 0 ? (
                                 <div className='text-center py-8 text-muted-foreground'>No available slots for this day</div>
                             ) : (
                                 <div className='space-y-3'>
                                     
-                                    <h3 className='text-lg font-medium text-white mb-2'>{day.displayedDate}</h3>
+                                    <h3 className='text-lg font-medium text-white mb-2'>{day.displayDate}</h3>
 
                                 <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2'>
                                 {day.slots.map((slot:Slot)=>(
-                                    <Card key={slot.startTime} 
+                                    <Card key={slot.startTime.toISOString()} 
                                     className={`border-emerald-900/20 cursor-pointer transition-all
                                      ${selectedSlot?.startTime === slot.startTime ? "bg-emerald-900/30 border-emerald-600" : "hover:border-emerald-700/40"}`}
                                      onClick={()=>handleSlotSelect(slot)}>

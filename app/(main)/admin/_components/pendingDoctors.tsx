@@ -26,14 +26,14 @@ export interface  Doctor {
 
 
 const PendingDoctors = ({doctors}: {doctors: Doctor[]}) => {
-    const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+    const [selectedDoctor, setSelectedDoctor] = useState<Doctor[] | null>(null);
     const {
         loading,
         data,
         fn:submitStatusUpdate
     } = useFetch(updateDoctorsStatus);
 
-    const handleViewDetails = (doctors:any)=>{
+    const handleViewDetails = (doctors:Doctor[])=>{
         setSelectedDoctor(doctors);
     }
 
@@ -77,8 +77,8 @@ const PendingDoctors = ({doctors}: {doctors: Doctor[]}) => {
 
             </div>
            ) : (
-            <div className='space-y-4'>
-                {doctors.map((doctor:any)=>(
+            <div className='space-y-4'>\
+                {doctors.map((doctor)=>(
                     <Card key={doctor.id} className="bg-muted/30 border-emerald-900/20 hover:bg-muted/40 transition-colors">
                         <CardContent className='p-4'>
                         <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>

@@ -1,7 +1,9 @@
 import React from 'react'
 import VideoCall from './_component/videoCall';
+import { useSearchParams } from 'next/navigation';
 
-const VideoCallpage = async({searchParams}: {searchParams: URLSearchParams}) => {
+const VideoCallpage = async() => {
+  const searchParams = useSearchParams();
     const { sessionId, token} = Object.fromEntries(searchParams);
   return (
     <div>

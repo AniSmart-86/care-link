@@ -1,9 +1,10 @@
 import { getAvailableTimeSlots, getDoctorById } from '@/actions/appointments';
-import { redirect } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import React from 'react'
 import DoctorsProfile from './_components/doctorsProfile';
 
-const DoctorProfilepage = async({params}:{params:{id:string}}) => {
+const DoctorProfilepage = async() => {
+    const params = useParams<{id:string}>();
     const {id} = await params;
 
     try {

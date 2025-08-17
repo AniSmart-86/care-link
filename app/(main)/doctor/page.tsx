@@ -21,9 +21,9 @@ const DoctorDashboard = async() => {
         redirect("/onboarding");
     }
 
-    // if(user?.verificationStatus !== "VERIFIED"){
-    //     redirect("/doctor/verification");
-    // }
+    if(user?.verificationStatus !== "VERIFIED"){
+        redirect("/doctor/verification");
+    }
   return (
     <Tabs defaultValue='appointments' 
      className='py-24 grid grid-cols-1 md:grid-cols-4 gap-6'>

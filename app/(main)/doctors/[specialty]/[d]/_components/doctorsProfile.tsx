@@ -42,15 +42,36 @@ type Doctor = {
   
 };
 
-const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDays: any[]; }) => {
+
+type AvailableDays = {
+  [day: string]: {
+    slots: Slot[];
+    date:Date;
+     displayDate: string;
+  };
+};
+
+ 
+
+
+
+type Slot = {
+    startTime: Date;
+    endTime: Date;
+    formatted: string;
+};
+
+const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDays:AvailableDays }) => {
   const [showBooking, setShowBooking] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const router = useRouter();
 
-  const handleSlotSelect = (slot:any) => {
+  const handleSlotSelect = (slot:Slot) => {
     setSelectedSlot(slot);
   };
 
+
+  
   const toggleBooking = () => {
     setShowBooking(!showBooking);
 
@@ -63,10 +84,11 @@ const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDa
     }
   };
 
-  const totalSlots = availableDays.reduce(
+  const totalSlots = Object.values(availableDays).reduce(
     (total, day) => total + day.slots.length,
     0
   );
+
 
   const handleBookingComplete = () => {
     router.push("/appointments");
@@ -197,9 +219,13 @@ const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDa
                   <div>
                     {!selectedSlot && (
                       <SlotPicker
-                        days={availableDays}
-                        onSelectSlot={handleSlotSelect}
-                      />
+  days={Object.values(availableDays).map((day) => ({
+    date: day.date,
+    slots: day.slots,
+    displayDate: day.displayDate,
+  }))}
+  onSelectSlot={handleSlotSelect}
+/>
                     )}
 
                     {selectedSlot && (

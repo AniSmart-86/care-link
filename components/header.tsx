@@ -11,9 +11,9 @@ import { Badge } from './ui/badge'
 
 const Header = async() => {
   const user = await createUser();
-  // if(user?.role === "PATIENT"){
-  //   await allocateCredits({user:{...user, transactions: []}});
-  // }
+  if(user?.role === "PATIENT"){
+    await allocateCredits({user:{...user, transactions: []}});
+  }
  
   return (
     <header className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b supports-[backdrop-filter]:bg-background/60 z-10">

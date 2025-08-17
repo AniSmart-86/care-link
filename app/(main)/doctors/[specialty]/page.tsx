@@ -2,15 +2,12 @@
 import { getDoctorsBySpecialty } from '@/actions/doctorslisting';
 import DoctorCard from '@/components/doctorCard';
 import PageHeader from '@/components/page.header'
-import { redirect} from 'next/navigation';
+import { redirect, useParams} from 'next/navigation';
 import React from 'react'
 
-type SpecialtyPageProps = {
-  params: {
-    specialty: string;
-  };
-};
-const SpecialtyPage = async ({params}:SpecialtyPageProps) => {
+
+const SpecialtyPage = async () => {
+  const params = useParams<{specialty:string}>();
 const { specialty } = await params;
 
 if(!specialty){

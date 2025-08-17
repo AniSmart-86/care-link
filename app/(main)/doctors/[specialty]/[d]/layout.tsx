@@ -1,12 +1,13 @@
 import { getDoctorById } from '@/actions/appointments';
 import PageHeader from '@/components/page.header';
-import { redirect } from 'next/navigation';
-import React from 'react'
+import { redirect, useParams } from 'next/navigation';
+import React, { ReactNode } from 'react'
 
 
 
 
-export async function generateMetadata({params}: {params: { id: string; }}) {
+export async function generateMetadata() {
+  const params = useParams<{id:string}>();
     const {id} = await params;
 
     const { doctor } = await getDoctorById(id);
@@ -20,7 +21,8 @@ export async function generateMetadata({params}: {params: { id: string; }}) {
 
 
 
-const DoctorProfilelayout = async({children, params}: {children: React.ReactNode; params: { id: string; }}) => {
+const DoctorProfilelayout = async({children}: {children: ReactNode}) => {
+ const params = useParams<{id:string}>();
 
     const {id} = await params;
 
