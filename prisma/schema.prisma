@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  clerkUserId String   @unique
+  email       String   @unique
+  name        String?
+  imageUrl    String?
+  role        UserRole @default(UNASSIGNED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creadits           Int                 @default(0)
+  specialty          String?
+  experience         Int?
+  credentialUrl      String?
+  description        String?             @db.Text
+  verificationStatus VerificationStatus? @default(PENDING)
+
+  patientAppointments Appointment[]       @relation("PatientAppointments")
+  doctorAppointments  Appointment[]       @relation("DoctorAppointments")
+  availabilities      Availability[]
+  transactions        CreditTransaction[]
+}
+
+enum UserRole {
+  UNASSIGNED
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model Availability {
+  id        String     @id @default(uuid())
+  doctorId  String
+  doctor    User       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+  status    SlotStatus
+
+  appointment Appointment[]
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+model Appointment {
+  id                 String            @id @default(uuid())
+  patientId          String
+  patient            User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId           String
+  doctor             User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  startTime          DateTime
+  endTime            DateTime
+  status             AppointmentStatus @default(SCHEDULED)
+  notes              String?           @db.Text
+  patientDescription String?           @db.Text
+
+  videoSessionId    String?
+  videoSessionToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  availabilityId String?
+  availability   Availability? @relation(fields: [availabilityId], references: [id])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+model CreditTransaction {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int
+  type        TransactionType
+  packageId   String?
+  createdAt   DateTime        @default(now())
+  description String?
+}
+
+enum TransactionType {
+  CREDIT_PURCHASE
+  APPOINTMENT_DEDUCTION
+  ADMIN_ADJUSTMENT
+}

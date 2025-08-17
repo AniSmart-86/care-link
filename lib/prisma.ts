@@ -1,0 +1,15 @@
+import { PrismaClient } from "./generated/prisma";
+
+
+
+declare global {
+  // Allow globalThis.prisma to be of type PrismaClient or undefined
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
+}
+
+const db = globalThis.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalThis.prisma = db;
+
+export default db;
