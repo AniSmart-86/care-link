@@ -1,4 +1,4 @@
-import AppointmentCard, { Appointment } from '@/components/appointmentCard';
+import AppointmentCard,{ Appointment } from '@/components/appointmentCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import React from 'react';

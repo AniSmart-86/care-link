@@ -20,11 +20,11 @@ import { cancelAppointment, addAppointmentNotes, markAppointmentCompleted } from
 
 
 
-interface Appointment {
+export interface Appointment {
   id: string;
   startTime: string;
   endTime: string;
-  
+
   patient: {
   name: string;
   email: string;
