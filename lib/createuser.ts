@@ -3,6 +3,7 @@ import db from "./prisma";
 
 
 
+
 export const createUser = async () => {
   // Get the current user from Clerk
   const user = await currentUser();

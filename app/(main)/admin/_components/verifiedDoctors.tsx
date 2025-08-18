@@ -10,30 +10,31 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-interface  Doctor {
-    id: string;
-    name: string | null;
-    email: string | null;
-    specialty: string | null;
-    experience: number | null;
-    credentialUrl: string | null;
-    description:string | null;
-    createdAt: Date;
-    verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" | null;
+
+
+interface Doctor {
+  id: string;
+  name: string;
+  email: string;
+  specialty: string;
+  experience: number;
 }
 
+interface VerifiedDoctorsProps {
+  doctors: Doctor[];
+}
 
-const VerifiedDoctors = ({doctors}: {doctors: Doctor[]}) => {
+const VerifiedDoctors: React.FC<VerifiedDoctorsProps> = ({doctors}) => {
 
     const [searchTerm,  setSearchTerm] = useState("");
     const [targetDoctor, setTargetDoctor] = useState<Doctor | null>(null);
 
-    const filteredDoctors = doctors.filter((doctor) => {
+    const filteredDoctors = doctors.filter((doctor: Doctor) => {
     const query = searchTerm.toLowerCase();
     return (
-        (doctor.name?.toLowerCase().includes(query) ?? false) ||
-        (doctor.specialty?.toLowerCase().includes(query) ?? false) ||
-        (doctor.email?.toLowerCase().includes(query) ?? false)
+        (doctor.name?.toLowerCase().includes(query) ) ||
+        (doctor.specialty?.toLowerCase().includes(query)) ||
+        (doctor.email?.toLowerCase().includes(query))
     );
 });
     const {
@@ -101,7 +102,7 @@ No verified doctors available at the moment.
 </div>
 ):(
 <div className='space-y-4'>
-                {doctors.map((doctor:any)=>(
+                {doctors.map((doctor)=>(
                     <Card key={doctor.id} className="bg-muted/30 border-emerald-900/20 hover:bg-muted/40 transition-colors">
                         <CardContent className='p-4'>
                         <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
@@ -118,7 +119,7 @@ No verified doctors available at the moment.
                             <div className='flex items-center gap-2 self-end md:self-auto'>
                                 <Badge variant={"outline"} className='bg-emerald-900/20 border-emerald-900/30 text-emerald-400'>Active</Badge>
                             <Button onClick={()=>handleStatusChange(doctor)} variant={"outline"} size="sm" className='bg-emerald-900/30 hover:bg-muted/80'>
-                            {loading && targetDoctor === doctor.id ? <Loader2 className='h-4 w-4 animate-spin' /> : <Ban className='h-4 w-4' />}
+                            {loading && targetDoctor?.id === doctor.id ? <Loader2 className='h-4 w-4 animate-spin' /> : <Ban className='h-4 w-4' />}
                                 Suspend                             
                             </Button>
                             </div>

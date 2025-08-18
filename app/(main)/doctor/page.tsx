@@ -1,16 +1,19 @@
-import { getcurrentUser } from '@/actions/onboarding'
+
 import { redirect } from 'next/navigation';
 import React from 'react'
-import { getDoctorAppointment, getDoctorsAvailability } from '@/actions/doctor';
+
 // import { Tabs, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { AlertCircle, Calendar, Clock, User } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AvailabilitySetting from './_components/availabilitySetting';
 import AppointmentList from './_components/appointmentList';
+import { getDoctorsAvailability } from '@/actions/availability';
+import { getDoctorAppointment } from '@/actions/patient';
+import { getCurrentUser } from '@/actions/user';
 
 const DoctorDashboard = async() => {
 
-    const user = await getcurrentUser();
+    const user = await getCurrentUser();
 
     const [appointmentsData, availabilityData] = await Promise.all([
         getDoctorAppointment(),
@@ -47,18 +50,12 @@ const DoctorDashboard = async() => {
 
             <TabsContent value="availability" className="border-none p-0">
   <AvailabilitySetting
-    slots={(availabilityData.slots || []).map(slot => ({
-      ...slot,
-      startTime:
-        slot.startTime instanceof Date
-          ? slot.startTime.toISOString()
-          : String(slot.startTime),
-      endTime:
-        slot.endTime instanceof Date
-          ? slot.endTime.toISOString()
-          : String(slot.endTime),
-    }))}
-  />
+  slots={availabilityData.slots.map((slot) => ({
+    id: slot.id,
+    startTime: slot.startTime.toISOString(),
+    endTime: slot.endTime.toISOString(),
+  })) || []}
+/>
 </TabsContent>
 
             </div>

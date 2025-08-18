@@ -7,25 +7,18 @@ import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner';
 
 
-type VideoCallProps = {
-    sessionId: string;
-    token: string;
-};
 
 declare global {
   interface Window {
     OT: any;
   }
 }
+interface VideoCallProps {
+  sessionId: string;
+  token: string;
+}
 
-// type Publisher = {
-//   publishVideo: (enabled: boolean) => void;
-//   on?: (...args: any[]) => void;
-
-
-// };
-
-const VideoCall = ({sessionId, token}:VideoCallProps) => {
+const VideoCall = ({sessionId, token}: VideoCallProps) => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -33,8 +26,8 @@ const VideoCall = ({sessionId, token}:VideoCallProps) => {
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
 
-    const sessionRef = useRef<any>(null);
-    const publisherRef = useRef<any>(null);
+    const sessionRef = useRef<any | null>(null);
+    const publisherRef = useRef<any | null>(null);
     const router = useRouter();
 
     const appId = process.env.NEXT_PUBLIC_VONAGE_APPLICATION_ID;
@@ -60,7 +53,7 @@ const VideoCall = ({sessionId, token}:VideoCallProps) => {
     try {
         sessionRef.current = window.OT.initSession(appId, sessionId);
 
-        sessionRef.current!.on("streamCreated", (event:any)=>{
+        sessionRef.current!.on("streamCreated", (event: {stream:any})=>{
             sessionRef.current!.subscribe(
                 event.stream,
                 "subscriber",

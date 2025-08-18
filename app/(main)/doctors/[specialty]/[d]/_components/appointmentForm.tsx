@@ -1,7 +1,7 @@
 "use client";
 
 import { bookAppointment } from "@/actions/appointments";
-import { Slot } from "@/app/(main)/doctor/_components/availabilitySetting";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,21 +11,26 @@ import { ArrowLeft, Calendar, Clock, CreditCard, Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-
-
-type Props = {
+interface AppointmentFormProps {
   doctorId: string;
-  slot: {
-    startTime: string;
-    endTime: string;
-    formatted: string;
-  };
+  slot: Slot;
   onBack: () => void;
   onComplete: () => void;
+}
+
+type Slot = {
+    startTime: Date;
+    endTime: Date;
+    formatted: string;
 };
 
-const AppointmentForm = ({ doctorId, slot, onBack, onComplete }: Props) => {
-  const [description, setDescription] = useState("");
+const AppointmentForm: React.FC<AppointmentFormProps> = ({
+  doctorId,
+  slot,
+  onBack,
+  onComplete,
+}) => {
+  const [description, setDescription] = useState<string>("");
 
   const { loading, data, fn: submitBooking } = useFetch(bookAppointment);
 
@@ -35,8 +40,8 @@ const AppointmentForm = ({ doctorId, slot, onBack, onComplete }: Props) => {
     const formData = new FormData();
 
     formData.append("doctorId", doctorId);
-    formData.append("startTime", slot.startTime);
-    formData.append("endTime", slot.endTime);
+  formData.append("startTime", slot.startTime.toISOString());
+  formData.append("endTime", slot.endTime.toISOString());
     formData.append("description", description);
 
     await submitBooking(formData);

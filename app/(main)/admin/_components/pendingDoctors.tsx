@@ -12,32 +12,39 @@ import React, { useEffect, useState } from 'react'
 import { format } from 'util';
 import BarLoader from 'react-spinners/BarLoader';
 
-export interface  Doctor {
-    id: string;
-    name: string | null;
-    email: string | null;
-    specialty: string | null;
-    experience: number | null;
-    credentialUrl: string | null;
-    description: string | null;
-    createdAt: Date;
-    verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" | null;
+
+
+
+
+interface Doctor {
+  id: string;
+  name: string;
+  email: string;
+  specialty: string;
+  experience: number;
+  credentialUrl: string;
+  description: string;
+  createdAt: Date;
+}
+
+interface Props {
+  doctors: Doctor[];
 }
 
 
-const PendingDoctors = ({doctors}: {doctors: Doctor[]}) => {
-    const [selectedDoctor, setSelectedDoctor] = useState<Doctor[] | null>(null);
+const PendingDoctors = ({doctors}:Props) => {
+    const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
     const {
         loading,
         data,
         fn:submitStatusUpdate
     } = useFetch(updateDoctorsStatus);
 
-    const handleViewDetails = (doctors:Doctor[])=>{
+    const handleViewDetails = (doctors: Doctor)=>{
         setSelectedDoctor(doctors);
     }
 
-    const handleCloseDialog: ()=>void =()=>{
+    const handleCloseDialog=()=>{
         setSelectedDoctor(null);
     }
 
@@ -51,7 +58,7 @@ const PendingDoctors = ({doctors}: {doctors: Doctor[]}) => {
         await submitStatusUpdate(formData);
 
         useEffect(() => {
-            if (data && data?.success) {
+            if (data && data.success) {
               handleCloseDialog();
             }
         }, [data]);
@@ -94,7 +101,7 @@ const PendingDoctors = ({doctors}: {doctors: Doctor[]}) => {
 
                             <div className='flex items-center gap-2 self-end md:self-auto'>
                                 <Badge variant={"outline"} className='bg-amber-900/20 border-amber-900/30 text-amber-400'>Pending</Badge>
-                            <Button onClick={()=>handleViewDetails(doctors)} variant={"outline"} size="sm" className='bg-emerald-900/30 hover:bg-muted/80'>
+                            <Button onClick={()=>handleViewDetails(doctor)} variant={"outline"} size="sm" className='bg-emerald-900/30 hover:bg-muted/80'>
                                 View Details
                             </Button>
                             </div>

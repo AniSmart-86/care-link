@@ -1,4 +1,5 @@
-import { verifyAdmin } from '@/actions/admin';
+
+import { isAdmin } from '@/actions/admin';
 import PageHeader from '@/components/page.header';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, ShieldCheck, User } from 'lucide-react';
@@ -12,9 +13,9 @@ export const metadata = {
 
 const Adminlayout = ({children}: {children: ReactNode}) => {
 
-    const isAdmin = verifyAdmin();
+    const Admin = isAdmin();
 
-    if(!isAdmin){
+    if(!Admin){
         redirect("/onboarding");
     }
   return (

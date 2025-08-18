@@ -3,20 +3,25 @@ import { redirect, useParams } from 'next/navigation';
 import React from 'react'
 import DoctorsProfile from './_components/doctorsProfile';
 
+
+
+type Doctor={
+    id: string;
+}
 const DoctorProfilepage = async() => {
-    const params = useParams<{id:string}>();
-    const {id} = await params;
+    const {id} = useParams();
+    
 
     try {
         const [doctorData, slotsData] = await Promise.all([
 
-            getDoctorById(id),
-            getAvailableTimeSlots(id)
+            getDoctorById(id as string),
+            getAvailableTimeSlots(id as string)
         ]);
 
         return (
         <div>
-<DoctorsProfile doctor={doctorData.doctor} 
+<DoctorsProfile doctor={doctorData.doctor as Doctor} 
                 availableDays={slotsData.days || []}/>
         </div>
         )

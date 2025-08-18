@@ -1,4 +1,5 @@
-import { getcurrentUser } from '@/actions/onboarding';
+
+import { getCurrentUser } from '@/actions/user';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, ClipboardCheck, XCircle } from 'lucide-react';
@@ -8,7 +9,7 @@ import React from 'react'
 
 const VerificationPage = async() => {
 
-    const user = await getcurrentUser();
+    const user = await getCurrentUser();
 
     // If doctor is verified, redirect to the dashboard page
     if (user && user.role === "DOCTOR" && user.verificationStatus === "VERIFIED") {

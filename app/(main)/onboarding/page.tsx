@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, Stethoscope, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useFetch from '@/hooks/useFetch';
-import { setUserRole } from '@/actions/onboarding';
+
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SPECIALTIES } from '@/lib/specialties';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { setUserRole } from '@/actions/user';
 
 
 const doctorFormSchema = z.object({

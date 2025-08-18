@@ -27,46 +27,38 @@ import SlotPicker from "./slotPicker";
 import AppointmentForm from "./appointmentForm";
 import { useRouter } from "next/navigation";
 
-type Doctor = {
-     id: string;
-    name: string | null;
-    email: string | null;
-    specialty: string | null;
-    imageUrl?: string | null;
-    experience: number | null;
-    credentialUrl: string | null;
-    description: string | null;
-    createdAt: Date;
-    verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" | null;
-
-  
-};
 
 
-type AvailableDays = {
-  [day: string]: {
-    slots: Slot[];
-    date:Date;
-     displayDate: string;
-  };
-};
+interface Doctor {
+  id: number;
+  name: string;
+  imageUrl: string | null;
+  specialty: string;
+  experience: number;
+  description: string;
+}
 
- 
+interface Slot {
+  startTime: Date;
+  endTime: Date;
+  formatted: string;
+}
 
+interface Day {
+  slots: Slot[];
+}
 
+interface Props {
+  doctor: Doctor;
+  availableDays: { [key: string]: Day };
+}
 
-type Slot = {
-    startTime: Date;
-    endTime: Date;
-    formatted: string;
-};
-
-const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDays:AvailableDays }) => {
+const DoctorsProfile: React.FC<Props> = ({ doctor, availableDays }) => {
   const [showBooking, setShowBooking] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const router = useRouter();
 
-  const handleSlotSelect = (slot:Slot) => {
+  const handleSlotSelect = (slot: Slot) => {
     setSelectedSlot(slot);
   };
 
@@ -90,6 +82,12 @@ const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDa
   );
 
 
+  const days = Object.values(availableDays).map((day) => ({
+  date: "", // replace with actual date value
+  displayDate: "",
+  slots: day.slots,
+}));
+
   const handleBookingComplete = () => {
     router.push("/appointments");
   };
@@ -104,7 +102,7 @@ const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDa
                   {doctor.imageUrl ? (
                     <Image
                       src={doctor.imageUrl}
-                      alt={doctor.name as string}
+                      alt={doctor.name}
                       fill
                       className="object-cover"
                     />
@@ -218,23 +216,19 @@ const DoctorsProfile = ({ doctor, availableDays }: { doctor: Doctor; availableDa
                 {totalSlots > 0 ? (
                   <div>
                     {!selectedSlot && (
-                      <SlotPicker
-  days={Object.values(availableDays).map((day) => ({
-    date: day.date,
-    slots: day.slots,
-    displayDate: day.displayDate,
-  }))}
+     <SlotPicker
+  days={days}
   onSelectSlot={handleSlotSelect}
 />
                     )}
 
                     {selectedSlot && (
-                      <AppointmentForm
-                        doctorId={doctor.id}
-                        slot={selectedSlot}
-                        onBack={() => setSelectedSlot(null)}
-                        onComplete={handleBookingComplete}
-                      />
+                    <AppointmentForm
+  doctorId={doctor.id.toString()}
+  slot={selectedSlot}
+  onBack={() => setSelectedSlot(null)}
+  onComplete={handleBookingComplete}
+/>
                     )}
                   </div>
                 ) : (

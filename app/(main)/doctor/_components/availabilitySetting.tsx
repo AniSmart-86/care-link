@@ -1,6 +1,6 @@
 "use client";
 
-import { setAvailabilitySlots } from "@/actions/doctor";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,29 +17,22 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { format } from "date-fns"; 
+import { setAvailabilitySlots } from "@/actions/availability";
 
-// Slot type for a single slot
-export type Slot = {
-  id: string;
-  startTime: string; // ISO date string
-  endTime: string; // ISO date string
-  doctorId?: string;
-  status?: "AVAILABLE" | "BOOKED" | "BLOCKED";
-  appointment?: any[];
-};
 
-// Props for the component
+
+
 interface AvailabilitySettingProps {
-  slots: Slot[];
+  slots: {
+    id: string;
+    startTime: string;
+    endTime: string;
+  }[];
 }
 
-// Form values type
-interface SlotFormValues {
-  startTime: string;
-  endTime: string;
-}
 
-const AvailabilitySetting: React.FC<AvailabilitySettingProps> = ({ slots }) => {
+
+const AvailabilitySetting: React.FC<AvailabilitySettingProps> = ({slots}) => {
   const { loading, fn: submitSlots, data } = useFetch(setAvailabilitySlots);
   const [showForm, setShowForm] = useState(false);
 
@@ -47,21 +40,15 @@ const AvailabilitySetting: React.FC<AvailabilitySettingProps> = ({ slots }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SlotFormValues>({
+  } = useForm({
     defaultValues: {
       startTime: "",
       endTime: "",
     },
   });
 
-  /**
-   * Creates a new Date object with the given time string set as the time,
-   * and the current date.
-   *
-   * @param {string} timeStr - A string representing the time in the format "HH:mm".
-   * @return {Date} A new Date object with the given time and the current date.
-   */
-  function createLocalDateFromTime(timeStr: string): Date {
+  
+  function createLocalDateFromTime(timeStr: string){
     const [hours, minutes] = timeStr.split(":").map(Number);
     const now = new Date();
     return new Date(
@@ -73,7 +60,7 @@ const AvailabilitySetting: React.FC<AvailabilitySettingProps> = ({ slots }) => {
     );
   }
 
-  function formatTimeString(dateString: string): string {
+  function formatTimeString(dateString: string){
     try {
       return format(new Date(dateString), "h:mm a");
     } catch {
@@ -81,7 +68,7 @@ const AvailabilitySetting: React.FC<AvailabilitySettingProps> = ({ slots }) => {
     }
   }
 
-  const onSubmit = async (formValues: SlotFormValues) => {
+  const onSubmit = async (formValues:{startTime: string, endTime: string}) => {
     if (loading) return;
 
     const startDate = createLocalDateFromTime(formValues.startTime);

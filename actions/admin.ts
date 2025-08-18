@@ -1,139 +1,72 @@
-"use server"
+"use server";
 
 import db from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
+import type { $Enums } from "@/lib/generated/prisma";
 import { revalidatePath } from "next/cache";
-import { _success } from "zod/v4/core";
+import { getString, getBoolean } from "@/lib/utils/form";
 
-export async function verifyAdmin(){
-    const { userId } = await auth();
+export async function isAdmin(): Promise<boolean> {
+  const { userId } = await auth();
+  if (!userId) return false;
 
-    if(!userId) return false;
- 
-    try {
-        const user = await db.user.findUnique({
-            where:{
-                clerkUserId: userId,
-            },
-        });
-        return user?.role === "ADMIN";
-    } catch (error) {
-        console.log("Error verifying admin",error)
-        return false;
-        
-    }
+  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
+  return user?.role === "ADMIN";
 }
 
-export async function getPendingDoctors(){
-    const isAdmin = await verifyAdmin();
+export async function getPendingDoctors() {
+  if (!(await isAdmin())) throw new Error("Unauthorized");
 
-    if(!isAdmin) throw new Error("Unauthorized");
-    try {
-        const pendingDoctors = await db.user.findMany({
-            where:{
-                role: "DOCTOR",
-                verificationStatus: "PENDING",
-            },
-            orderBy:{
-                createdAt: "desc",
-            },
-        });
-        return {doctors: pendingDoctors};
-    } catch (error) {
-        throw new Error("Failed to fetch pending doctors");
-        
-    }
+  const doctors = await db.user.findMany({
+    where: { role: "DOCTOR", verificationStatus: "PENDING" },
+    orderBy: { createdAt: "desc" },
+  });
+  return { doctors };
 }
 
-export async function getVerifiedDoctors(){
-    const isAdmin = await verifyAdmin();
+export async function getVerifiedDoctors() {
+  if (!(await isAdmin())) throw new Error("Unauthorized");
 
-    if(!isAdmin) throw new Error("Unauthorized");
-    try {
-        const verifiedDoctors = await db.user.findMany({
-            where:{
-                role: "DOCTOR",
-                verificationStatus: "VERIFIED",
-            },
-            orderBy:{
-                createdAt: "asc",
-            },
-        });
-        return {doctors: verifiedDoctors};
-    } catch (error) {
-        throw new Error("Failed to fetch verify doctors");
-        
-    }
+  const doctors = await db.user.findMany({
+    where: { role: "DOCTOR", verificationStatus: "VERIFIED" },
+    orderBy: { createdAt: "asc" },
+  });
+  return { doctors };
 }
 
-export async function updateDoctorsStatus(formData: FormData){
-    const isAdmin = await verifyAdmin();
+export async function updateDoctorsStatus(formData: FormData) {
+  if (!(await isAdmin())) throw new Error("Unauthorized");
 
-    if(!isAdmin) throw new Error("Unauthorized");
+  const doctorId = getString(formData, "doctorId");
+  const status = getString(formData, "status");
 
-    const doctorId = formData.get("doctorId");
-    const status = formData.get("status");
+  const allowed: $Enums.VerificationStatus[] = ["VERIFIED", "REJECTED"];
+  if (!allowed.includes(status as $Enums.VerificationStatus)) {
+    throw new Error("Invalid status");
+  }
 
-    if (
-        typeof doctorId !== "string" ||
-        typeof status !== "string" ||
-        !["VERIFIED", "REJECTED"].includes(status)
-    ) {
-        throw new Error("invalid input");
-    }
+  await db.user.update({
+    where: { id: doctorId },
+    data: { verificationStatus: status as $Enums.VerificationStatus },
+  });
 
-    try {
-        await db.user.update({
-            where:{
-                id: doctorId,
-            },
-            data:{
-                verificationStatus: status as any, 
-            }
-        });
-
-        revalidatePath("/admin");
-        return {success: true}
-     
-    } catch (error) {
-        console.log(error)
-        throw new Error("Failed to update doctors status");
-        
-    }
+  revalidatePath("/admin");
+  return { success: true };
 }
 
+export async function updateDoctorsActiveStatus(formData: FormData) {
+  if (!(await isAdmin())) throw new Error("Unauthorized");
 
-export async function updateDoctorsActiveStatus(formData: FormData){
-    const isAdmin = await verifyAdmin();
+  const doctorId = getString(formData, "doctorId");
+  const suspend = getBoolean(formData, "suspend");
 
-    if(!isAdmin) throw new Error("Unauthorized");
+  const nextStatus: $Enums.VerificationStatus = suspend ? "PENDING" : "VERIFIED";
 
-    const doctorId = formData.get("doctorId");
-    const suspend = formData.get("suspend") === "true";
+  await db.user.update({
+    where: { id: doctorId },
+    data: { verificationStatus: nextStatus },
+  });
 
-    if (!doctorId) {
-        throw new Error("Doctor id is required");
-    }
-
-    try {
-
-        const status = suspend ? "PENDING" : "VERIFIED";
-
-        await db.user.update({
-            where:{
-                id: doctorId as string,
-            },
-            data:{
-                verificationStatus: status, // Cast to enum type
-            }
-        });
-
-        revalidatePath("/admin");
-        return {success: true}
-     
-    } catch (error) {
-        console.log(error)
-        throw new Error("Failed to update doctors status");
-        
-    }
+  revalidatePath("/admin");
+  return { success: true };
 }

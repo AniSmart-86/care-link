@@ -1,5 +1,6 @@
-import { getcurrentUser } from '@/actions/onboarding'
+
 import { getPatientAppointments } from '@/actions/patient';
+import { getCurrentUser } from '@/actions/user';
 import AppointmentCard from '@/components/appointmentCard';
 import PageHeader from '@/components/page.header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +10,7 @@ import React from 'react'
 
 const PatientAppointmentpage = async() => {
 
-    const user = await getcurrentUser();
+    const user = await getCurrentUser();
 
     if(!user || user.role !== "PATIENT"){
         redirect("/onboarding");
@@ -34,7 +35,9 @@ const PatientAppointmentpage = async() => {
                     {appointments?.map((appointment)=>(
                         <AppointmentCard
                         key={appointment.id}
-                        appointment={appointment}
+                        appointment={{...appointment,
+                            
+                        }}
                         userRole={"PATIENT"}/>
                     ))}
                 </div>

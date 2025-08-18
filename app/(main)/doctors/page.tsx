@@ -1,5 +1,6 @@
 "use client"
-import { getcurrentUser } from '@/actions/onboarding';
+
+import { getCurrentUser } from '@/actions/user';
 import { Card, CardContent } from '@/components/ui/card';
 import { SPECIALTIES } from '@/lib/specialties';
 import Link from 'next/link';
@@ -11,10 +12,10 @@ import { toast } from 'sonner';
 const SpecialtyPage = () => {
 
   
-   const [user, setUser] = useState<Awaited<ReturnType<typeof getcurrentUser>> | null>(null);
+   const [user, setUser] = useState<Awaited<ReturnType<typeof getCurrentUser>> | null>(null);
 
   useEffect(() => {
-    getcurrentUser().then(setUser);
+    getCurrentUser().then(setUser);
   }, []);
 
 
@@ -41,6 +42,7 @@ right specialist for your needs.
           toast.warning("Please complete onboarding to view doctors.");
         }
       }}>
+
  <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full duration-300">
     
 <CardContent className='p-6 flex flex-col items-center justify-center text-center h-full'>

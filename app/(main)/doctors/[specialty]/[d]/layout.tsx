@@ -8,7 +8,7 @@ import React, { ReactNode } from 'react'
 
 export async function generateMetadata() {
   const params = useParams<{id:string}>();
-    const {id} = await params;
+    const {id} =  params;
 
     const { doctor } = await getDoctorById(id);
 
@@ -22,9 +22,8 @@ export async function generateMetadata() {
 
 
 const DoctorProfilelayout = async({children}: {children: ReactNode}) => {
- const params = useParams<{id:string}>();
+ const {id} = useParams<{id:string}>();
 
-    const {id} = await params;
 
     const { doctor } = await getDoctorById(id);
 

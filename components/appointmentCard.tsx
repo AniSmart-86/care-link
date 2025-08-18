@@ -1,7 +1,8 @@
 "use client"
 
 import { generateVideoSession } from '@/actions/appointments';
-import { addAppointmentNotes, cancelAppointment, markAppointmentCompleted } from '@/actions/doctor';
+
+
 import useFetch from '@/hooks/useFetch';
 import { format } from 'date-fns';
 import { Calendar, CheckCircle, Clock, Edit, Loader2, Stethoscope, User, Video, X } from 'lucide-react';
@@ -13,42 +14,40 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { useRouter } from 'next/navigation';
 import { Textarea } from './ui/textarea';
+import { cancelAppointment, addAppointmentNotes, markAppointmentCompleted } from '@/actions/patient';
 
-// src/types.ts
-export type User = {
+
+
+
+
+interface Appointment {
   id: string;
-    name: string | null;
-    specialty: string | null;
-    imageUrl: string | null;
-    email: string | null;
-    
- 
+  startTime: string;
+  endTime: string;
+  
+  patient: {
+  name: string;
+  email: string;
 };
+    doctor: {
+      name: string | null;
+      id: string;
+      email: string;
+      imageUrl: string | null;
+      specialty: string | null;
+    };
+  patientDescription?: string;
+  notes?: string;
+  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
+}
 
-export type Appointment = {
-  id: string;
-  patientId: string;
-  doctorId: string;
-  startTime: Date;
-  endTime: Date;
-  status: string;
-  notes: string | null;
-  patientDescription: string | null;
-  doctor?:{
-id: string;
-    name: string | null;
-    specialty: string | null;
-    imageUrl: string | null;
-    email: string | null;
-  },
-  patient?: User;
- 
- 
-};
+interface Props {
+  appointment: Appointment;
+  userRole: string;
+}
 
 
-
-const AppointmentCard = ({appointment, userRole}:{appointment: Appointment, userRole: string}) => {
+const AppointmentCard: React.FC<Props> = ({appointment, userRole}) => {
     const [open, setOpen] = useState(false);
     const [action, setAction] = useState<string | null>(null);
     const [notes, setNotes] = useState(appointment.notes || "");
@@ -74,7 +73,7 @@ const AppointmentCard = ({appointment, userRole}:{appointment: Appointment, user
             data: completeData
     } = useFetch(markAppointmentCompleted);
 
-    const formatTime = (dateString:string | Date)=>{
+    const formatTime = (dateString: string)=>{
         try {
             return format(new Date(dateString), "h:mm a")
         } catch (error) {
@@ -82,7 +81,7 @@ const AppointmentCard = ({appointment, userRole}:{appointment: Appointment, user
         }
     }
 
-    const formatDateTime = (dateString:string | Date)=>{
+    const formatDateTime = (dateString: string)=>{
         try {
             return format(new Date(dateString), "MMM d, yyyy 'at' h:mm a")
         } catch (error) {
@@ -206,12 +205,12 @@ const AppointmentCard = ({appointment, userRole}:{appointment: Appointment, user
 
                         {userRole === "DOCTOR" && (
                             <p className='text-sm text-muted-foreground'>
-                                {otherParty?.email}
+                                {("email" in otherParty) ? otherParty.email : ""}
                             </p>
                         )}
                         {userRole === "PATIENT" && (
                             <p className='text-sm text-muted-foreground'>
-                                {otherParty?.specialty}
+                                 {("specialty" in otherParty) ? otherParty.specialty : ""}
                             </p>
                         )}
 
@@ -303,10 +302,10 @@ const AppointmentCard = ({appointment, userRole}:{appointment: Appointment, user
     </p>
 
     {userRole === "DOCTOR" &&(
-    <p className='text-muted-foreground text-sm'>{otherParty?.email}</p>
+    <p className='text-muted-foreground text-sm'> {("email" in otherParty) ? otherParty.email : ""}</p>
     )}
     {userRole === "PATIENT" &&(
-    <p className='text-muted-foreground text-sm'>{otherParty?.specialty}</p>
+    <p className='text-muted-foreground text-sm'> {("specialty" in otherParty) ? otherParty.specialty : ""}</p>
     )}
     </div>
 </div>
